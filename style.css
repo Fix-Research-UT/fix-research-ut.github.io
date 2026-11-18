@@ -214,3 +214,7 @@ body[data-static] {
     linear-gradient(180deg, #eef5fd 0%, #f6fafe 45%, #f2faf8 100%);
   background-attachment: fixed;
 }
+
+/* Landing page: tagline and topic line under the title */
+.tagline { font-size: clamp(1.05rem, 2.2vw, 1.3rem); color: var(--text); margin: 12px 0 14px; max-width: 960px; text-align: center; text-wrap: balance; animation: rise 1s .3s ease both; }
+.eyebrow.topics { margin: 0; animation-delay: .45s; }

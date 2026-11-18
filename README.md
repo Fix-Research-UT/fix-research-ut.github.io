@@ -1,4 +1,4 @@
-# Fix Research Group website
+# The Fix Lab website
 
 Static site (HTML + CSS, no build step).
 
