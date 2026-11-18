@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Tacos | The Fix Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="../logo.png">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .taco-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .taco-grid img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block; }
+    .gate { max-width: 360px; margin: 40px auto; text-align: center; }
+    .gate input { font: inherit; padding: 10px 12px; width: 100%; margin: 8px 0 12px; border: 1px solid #b8cde4; background: #fff; }
+    .gate .btn { cursor: pointer; font: inherit; }
+    .err { color: #b3261e; }
+  </style>
+</head>
+<body data-static>
+  <canvas id="vapor" aria-hidden="true"></canvas>
+
+  <main>
+    <section class="hero compact" id="top">
+      <div class="title-row">
+        <img class="logo" src="../logo.png" alt="Fix Lab logo">
+        <h1 class="grad">Tacos</h1>
+      </div>
+    </section>
+    <section class="page">
+      <form id="gate" class="gate">
+        <p>This page is password protected.</p>
+        <input id="pw" type="password" placeholder="Password" autocomplete="off" autofocus>
+        <button class="btn" type="submit">Enter</button>
+        <p id="err" class="err" hidden>Wrong password.</p>
+      </form>
+      <div class="taco-grid" id="tacos" hidden></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">&copy; <span id="year">2026</span> The Fix Lab</footer>
+  <script>
+    // Photos: tacos/photos/taco-1.jpg (or .jpeg, .png), taco-2, ... up to 60. Missing ones are skipped.
+    const HASH = '1734c8d3b028f603483d60ab3ab8a61cf6a41f93709cf47fa01d30a90ee2282c'; // SHA-256 of the password
+    const grid = document.getElementById('tacos');
+    const gate = document.getElementById('gate');
+    async function sha(t) {
+      const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t));
+      return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+    }
+    function load() {
+      gate.hidden = true; grid.hidden = false;
+      for (let i = 1; i <= 60; i++) {
+        const slot = document.createElement('div'); slot.hidden = true; grid.appendChild(slot);
+        const exts = ['jpg', 'jpeg', 'png'];
+        (function tryNext(k) {
+          if (k >= exts.length) return;
+          const img = new Image(); img.alt = 'Taco ' + i;
+          img.onload = () => { slot.appendChild(img); slot.hidden = false; };
+          img.onerror = () => tryNext(k + 1);
+          img.src = 'photos/taco-' + i + '.' + exts[k];
+        })(0);
+      }
+    }
+    gate.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (await sha(document.getElementById('pw').value) === HASH) {
+        try { sessionStorage.setItem('tacos', '1'); } catch (_) {}
+        load();
+      } else document.getElementById('err').hidden = false;
+    });
+    try { if (sessionStorage.getItem('tacos')) load(); } catch (_) {}
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
